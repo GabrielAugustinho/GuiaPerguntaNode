@@ -21,7 +21,13 @@ app.use(express.json());
 
 // Rotas
 app.get("/", (req, res) => {    
-    res.render("index");
+    // Select * from perguntas
+    Pergunta.finAll({ raw: true }).then(perguntas => {
+        // Enviando as perguntas para o front-end
+        res.render("index", {
+            perguntas: perguntas
+        });
+    });    
 });
 
 app.get("/perguntar",(req, res) =>{
