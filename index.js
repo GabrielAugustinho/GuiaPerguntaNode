@@ -31,7 +31,14 @@ app.get("/perguntar",(req, res) =>{
 app.post("/perguntarSalvar",(req, res) =>{
     var titulo = req.body.titulo;
     var descricao = req.body.descricao;
-    res.send("formulario recebido! titulo " + titulo + " " + " descricao " + descricao);
+    // Salvando no banco de dados
+    Pergunta.create({
+        titulo: titulo,
+        descricao: descricao    
+    }).then(()=>{
+        // Quando a pergunta for salva jogo o usuário novamente para a página inicial.
+        res.redirect("/");
+    });
 });
 
 
