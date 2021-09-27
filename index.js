@@ -21,8 +21,10 @@ app.use(express.json());
 
 // Rotas
 app.get("/", (req, res) => {    
-    // Select * from perguntas
-    Pergunta.finAll({ raw: true }).then(perguntas => {
+    // Select * from perguntas Order by DESC
+    Pergunta.findAll({ raw: true, order:[
+        ['id','DESC'] // ASC crescente || DESC decrescente      
+    ]}).then(perguntas => {
         // Enviando as perguntas para o front-end
         res.render("index", {
             perguntas: perguntas
@@ -47,6 +49,22 @@ app.post("/perguntarSalvar",(req, res) =>{
     });
 });
 
+// Rota que direciona para a página das perguntas
+app.get("/pergunta/:id", (req, res) => {
+    var id = req.params.id;
+    // Busca no banco de dados a pergunta que têm a variavel id.
+    Pergunta.findOne({
+        where: { id: id }
+    }).then(pergunta =>{
+        if(pergunta != undefined){ // Pergunta achada
+            res.render("pergunta", {
+               pergunta: pergunta 
+            });
+        } else{ // Não encontrada
+            res.redirect("/");
+        }
+    });
+});
 
 // Caminho
 app.listen(8080,()=>{console.log("App Rodando!")});
