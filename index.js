@@ -1,5 +1,16 @@
 const express = require("express");
 const app = express();
+const connection = require("./database/database");
+const Pergunta = require("./database/Pergunta");
+
+// Database
+connection.authenticate()
+    .then(() => {
+        console.log("Conexão feita com o banco de dados!");
+    })
+    .catch((msgErro) => {
+        console.log(msgErro);
+    });
 
 // Usando o express para dizer que o EJS é a engine
 app.set('view engine', 'ejs');
@@ -20,7 +31,7 @@ app.get("/perguntar",(req, res) =>{
 app.post("/perguntarSalvar",(req, res) =>{
     var titulo = req.body.titulo;
     var descricao = req.body.descricao;
-    res.send("formulario recebido");
+    res.send("formulario recebido! titulo " + titulo + " " + " descricao " + descricao);
 });
 
 
