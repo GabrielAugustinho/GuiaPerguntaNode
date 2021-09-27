@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const connection = require("./database/database");
 const Pergunta = require("./database/Pergunta");
+const Resposta = require("./database/Resposta");
 
 // Database
 connection.authenticate()
@@ -52,19 +53,40 @@ app.post("/perguntarSalvar",(req, res) =>{
 // Rota que direciona para a página das perguntas
 app.get("/pergunta/:id", (req, res) => {
     var id = req.params.id;
-    // Busca no banco de dados a pergunta que têm a variavel id.
+    // Busca no banco de dados a PERGUNTA que têm a variavel id.
     Pergunta.findOne({
         where: { id: id }
     }).then(pergunta =>{
         if(pergunta != undefined){ // Pergunta achada
-            res.render("pergunta", {
-               pergunta: pergunta 
-            });
+            // Busca todas as RESPOSTAS da pergunta.
+            Resposta.findAll({
+                where: { perguntaID: pergunta.id },
+                order: [
+                    ['id', 'DESC']
+                ] 
+            }).then(respostas => {
+                res.render("pergunta", {
+                    pergunta: pergunta,
+                    respostas: respostas
+                });
+            });            
         } else{ // Não encontrada
             res.redirect("/");
         }
     });
 });
+
+app.post("/responder", (req, res) => {
+    var corpo = req.body.corpo;
+    var perguntaID = req.body.perguntaID;
+    Resposta.create({
+        corpo: corpo,
+        perguntaID: perguntaID    
+    }).then(()=>{
+        // Quando a pergunta for salva jogo o usuário novamente para a página inicial.
+        res.redirect("/pergunta"+perguntaID);
+    });
+})
 
 // Caminho
 app.listen(8080,()=>{console.log("App Rodando!")});
